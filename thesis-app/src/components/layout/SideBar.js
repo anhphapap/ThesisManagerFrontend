@@ -14,32 +14,35 @@ import {
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const [active, setActive] = useState(window.location.pathname);
 
   const menuItems = [
-    { icon: <House />, label: "Quản lý đào tạo" },
-    { icon: <PersonBadge />, label: "Quản lý giảng viên" },
-    { icon: <People />, label: "Quản lý sinh viên" },
-    { icon: <FileEarmarkText />, label: "Quản lý khóa luận" },
-    { icon: <PeopleFill />, label: "Quản lý hội đồng" },
-    { icon: <BarChart />, label: "Tổng quan" },
-    { icon: <Gear />, label: "Thiết lập hệ thống" },
+    { icon: <FileEarmarkText />, label: "Quản lý khóa luận", path: "/thesis" },
+    { icon: <PeopleFill />, label: "Quản lý hội đồng", path: "/committee" },
+    { icon: <PeopleFill />, label: "Quản lý hội đồng", path: "/test" },
   ];
 
   return (
     <div
-      className="d-flex flex-column bg-primary text-white"
+      className="d-flex flex-column text-white bg-dark"
       style={{
-        width: collapsed ? "60px" : "220px",
+        width: collapsed ? "50px" : "220px",
         transition: "0.3s",
+        height: "100%",
       }}
     >
       <Nav className="flex-column mt-2">
         {menuItems.map((item, index) => (
           <Nav.Link
             key={index}
-            href="#"
-            className="d-flex align-items-center text-white px-3 py-2"
-            style={{ fontSize: "14px" }}
+            href={item.path}
+            className={`d-flex align-items-center px-3 py-2 ${
+              active === item.path
+                ? "bg-light text-dark border-start border-3 border-danger"
+                : "text-white"
+            }`}
+            style={{ fontSize: "16px" }}
+            onClick={() => setActive(item.path)}
           >
             {item.icon}
             {!collapsed && <span className="ms-2">{item.label}</span>}

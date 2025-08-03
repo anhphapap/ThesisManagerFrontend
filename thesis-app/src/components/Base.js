@@ -2,17 +2,14 @@ import React from "react";
 import Header from "./layout/Header";
 import Sidebar from "./layout/SideBar";
 
-const Base = () => {
+const Base = ({ children }) => {
   return (
-    <div>
+    <div className="d-flex flex-column" style={{ height: "100vh" }}>
       <Header />
-      <div className="d-flex">
+      <div className="d-flex" style={{ height: "100%" }}>
         <Sidebar />
-        <div
-          className="flex-grow-1 p-3"
-          style={{ backgroundColor: "#f8f9fa", minHeight: "100vh" }}
-        >
-          <p>Nội dung chính</p>
+        <div className="flex-grow-1 p-3" style={{ backgroundColor: "#f6f7fc" }}>
+          {children}
         </div>
       </div>
     </div>

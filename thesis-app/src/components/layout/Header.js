@@ -6,22 +6,26 @@ const Header = () => {
   return (
     <Navbar bg="dark" variant="dark" expand="lg" className="px-3">
       <Container fluid>
-        <Navbar.Brand className="d-flex align-items-center">
+        <Navbar.Brand className="d-flex align-items-center justify-content-center">
           <img
-            src="/logo.png"
-            alt="logo"
-            style={{ height: "30px", marginRight: "8px" }}
+            src="https://ou.edu.vn/wp-content/uploads/2016/08/Logo.png"
+            style={{ height: "40px", marginRight: "16px" }}
           />
           <div className="d-flex flex-column">
-            <span className="fw-bold">Trường Đại học Công nghệ - ĐHQGHN</span>
-            <small className="text-white-50">
+            <span
+              className="fw-bold"
+              style={{ fontSize: "20px", textTransform: "uppercase" }}
+            >
               Hệ thống quản lý khóa luận tốt nghiệp
-            </small>
+            </span>
           </div>
         </Navbar.Brand>
         <Nav className="ms-auto align-items-center">
           <PersonCircle size={28} className="me-2 text-white" />
-          <span className="text-white">Nguyễn Văn B</span>
+          <span className="text-white">Nguyễn Văn B,</span>
+          <a href="#" className="text-white">
+            <span className="ms-2">Đăng xuất</span>
+          </a>
         </Nav>
       </Container>
     </Navbar>
