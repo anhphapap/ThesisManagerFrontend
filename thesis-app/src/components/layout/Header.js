@@ -1,8 +1,12 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Navbar, Container, Nav } from "react-bootstrap";
 import { PersonCircle } from "react-bootstrap-icons";
+import { UserContext } from "../../configs/Contexts";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
+  const navigate = useNavigate();
+  const [user, dispatch] = useContext(UserContext);
   return (
     <Navbar bg="dark" variant="dark" expand="lg" className="px-3">
       <Container fluid>
@@ -23,9 +27,15 @@ const Header = () => {
         <Nav className="ms-auto align-items-center">
           <PersonCircle size={28} className="me-2 text-white" />
           <span className="text-white">Nguyễn Văn B,</span>
-          <a href="#" className="text-white">
+          <button
+            className="text-white btn btn-danger"
+            onClick={() => {
+              dispatch({ type: "logout" });
+              navigate("/login");
+            }}
+          >
             <span className="ms-2">Đăng xuất</span>
-          </a>
+          </button>
         </Nav>
       </Container>
     </Navbar>
