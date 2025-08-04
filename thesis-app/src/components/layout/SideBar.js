@@ -23,14 +23,14 @@ const Sidebar = () => {
     {
       icon: <PeopleFill />,
       label: "Quản lý hội đồng",
-      path: "/lecturers",
-      role: "ROLE_USER",
+      path: "/councils",
+      role: "ROLE_STAFF",
     },
     {
-      icon: <PeopleFill />,
-      label: "Quản lý hội đồng",
-      path: "/test",
-      role: "ROLE_STAFF",
+      icon:<PeopleFill/>,
+      label: "Quản lý khóa luận",
+      path: "/thesises",
+      role: "ROLE_STAFF"
     },
   ];
 

@@ -7,6 +7,7 @@ const BASE_URL = "http://localhost:8080/ThesisManagement/api";
 export const endpoints = {
   login: "/login",
   profile: "/secure/profile",
+  faculties: "/faculties"
 };
 
 export const authApis = () =>

@@ -26,7 +26,7 @@ const Header = () => {
         </Navbar.Brand>
         <Nav className="ms-auto align-items-center">
           <PersonCircle size={28} className="me-2 text-white" />
-          <span className="text-white">Nguyễn Văn B,</span>
+          <span className="text-white"></span>
           <button
             className="text-white btn btn-danger"
             onClick={() => {

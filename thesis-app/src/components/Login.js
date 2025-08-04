@@ -35,23 +35,12 @@ const Login = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      let res = await Apis.post(endpoints["login"], {
+      let res = await Apis.post(endpoints.login, {
         ...user,
         role: role,
       });
-      console.info("Login Response:", res.data);
       cookie.save("token", res.data.token);
-      console.info("Token saved:", cookie.load("token"));
-
-      let u = await authApis().get(endpoints["profile"]);
-      console.info("User Profile:", u.data);
-
-      console.log("=== THÔNG TIN USER ĐÃ ĐĂNG NHẬP ===");
-      console.log("Username:", user.username);
-      console.log("Role:", role);
-      console.log("Token:", res.data.token);
-      console.log("User Profile Data:", u.data);
-      console.log("=====================================");
+      let u = await authApis().get(endpoints.profile);
 
       dispatch({ type: "login", payload: u.data });
 
@@ -63,8 +52,8 @@ const Login = () => {
           nav("/students");
         } else if (role === "lecturer") {
           nav("/lecturers");
-        } else {
-          nav("/");
+        } else if (role === "staff"){
+          nav("/councils");
         }
       }
     } catch (error) {

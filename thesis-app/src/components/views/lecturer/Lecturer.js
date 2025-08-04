@@ -1,5 +1,11 @@
+import Base from "../../Base";
+
 const Lecturer = () =>{
-    return("lecturer")
+    return(
+        <Base>
+            lecturer
+        </Base>
+    )
 }
 
 export default Lecturer;
