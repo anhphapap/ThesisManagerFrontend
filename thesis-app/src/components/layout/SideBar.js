@@ -17,8 +17,8 @@ const Sidebar = () => {
     {
       icon: <FileEarmarkText />,
       label: "Quản lý khóa luận",
-      path: "/students",
-      role: "student",
+      path: "/students/thesis",
+      role: "STUDENT",
     },
     {
       icon: <PeopleFill />,
@@ -27,9 +27,9 @@ const Sidebar = () => {
       role: "ROLE_USER",
     },
     {
-      icon: <PeopleFill />,
-      label: "Quản lý hội đồng",
-      path: "/test",
+      icon: <FileEarmarkText />,
+      label: "Quản lý khóa luận",
+      path: "/staff/thesis",
       role: "ROLE_STAFF",
     },
   ];

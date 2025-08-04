@@ -25,16 +25,30 @@ const Header = () => {
           </div>
         </Navbar.Brand>
         <Nav className="ms-auto align-items-center">
-          <PersonCircle size={28} className="me-2 text-white" />
-          <span className="text-white">Nguyễn Văn B,</span>
+          {user.avatar ? (
+            <img
+              src={user.avatar}
+              style={{
+                height: "32px",
+                width: "32px",
+                objectFit: "cover",
+                marginRight: "8px",
+                borderRadius: "50%",
+                border: "1px solid white",
+              }}
+            />
+          ) : (
+            <PersonCircle size={28} className="me-2 text-white" />
+          )}
+          <span className="text-white">{user.fullName}</span>
           <button
-            className="text-white btn btn-danger"
+            className="text-white btn btn-danger ms-2"
             onClick={() => {
               dispatch({ type: "logout" });
               navigate("/login");
             }}
           >
-            <span className="ms-2">Đăng xuất</span>
+            <span>Đăng xuất</span>
           </button>
         </Nav>
       </Container>

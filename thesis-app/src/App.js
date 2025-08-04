@@ -5,7 +5,8 @@ import Login from "./components/Login";
 import { useReducer } from "react";
 import Lecturer from "./components/views/lecturer/Lecturer";
 import Base from "./components/Base";
-import Thesis from "./components/views/student/Thesis";
+import StudentThesis from "./components/views/student/StudentThesis";
+import StaffThesis from "./components/views/staff/StaffThesis";
 const App = () => {
   let [user, dispatch] = useReducer(UserReducer, null);
   console.log("user", user);
@@ -14,12 +15,12 @@ const App = () => {
       <BrowserRouter>
         <Routes>
           {user != null ? (
-            user.role === "student" ? (
-              <Route path="/students" element={<Thesis />} />
+            user.role === "STUDENT" ? (
+              <Route path="/students/thesis" element={<StudentThesis />} />
             ) : user.role === "ROLE_USER" ? (
               <Route path="/lecturers" element={<Lecturer />} />
             ) : (
-              <Route path="/" element={<Base />} />
+              <Route path="/staff/thesis" element={<StaffThesis />} />
             )
           ) : (
             <>

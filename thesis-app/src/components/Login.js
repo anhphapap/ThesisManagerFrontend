@@ -60,11 +60,11 @@ const Login = () => {
         nav(next);
       } else {
         if (role === "student") {
-          nav("/students");
+          nav("/students/thesis");
         } else if (role === "lecturer") {
           nav("/lecturers");
         } else {
-          nav("/");
+          nav("/staff/thesis");
         }
       }
     } catch (error) {
