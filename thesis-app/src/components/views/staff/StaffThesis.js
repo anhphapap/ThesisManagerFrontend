@@ -5,7 +5,7 @@ function StaffThesis() {
   return (
     <Base>
       <div className="container d-flex flex-column justify-content-center">
-        <h3 className="fw-bold">Khóa luận của tôi</h3>
+        <h3 className="fw-bold">Danh sách khóa luận</h3>
       </div>
     </Base>
   );

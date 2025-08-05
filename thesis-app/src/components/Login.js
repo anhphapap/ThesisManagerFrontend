@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { Button, Form } from "react-bootstrap";
+import { Button, Form, Spinner } from "react-bootstrap";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { UserContext } from "../configs/Contexts";
 import Apis, { authApis, endpoints } from "../configs/Apis";
@@ -111,7 +111,12 @@ const Login = () => {
           ))}
 
           <Button type="submit" className="submit-btn" disabled={loading}>
-            Submit
+            <span className="submit-btn-text">Submit</span>
+            {loading && (
+              <span className="submit-btn-loading">
+                <Spinner animation="border" variant="light" size="sm" />
+              </span>
+            )}
           </Button>
           <p className="forgot-password">
             Forgot <a href="#">password?</a>

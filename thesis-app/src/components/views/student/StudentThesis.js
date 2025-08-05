@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import Base from "../../../components/Base";
 import Apis, { authApis, endpoints } from "../../../configs/Apis";
 import { UserContext } from "../../../configs/Contexts";
+import { useNavigate } from "react-router-dom";
 
 function StudentThesis() {
   const [user] = useContext(UserContext);
@@ -16,14 +17,18 @@ function StudentThesis() {
   const [activeLecturer, setActiveLecturer] = useState(true);
   const [errors, setErrors] = useState({});
   const [registered, setRegistered] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const fetchLecturers = async (facultyId) => {
+    setLoading(true);
     if (facultyId !== "") {
       const response = await Apis.get(endpoints.lecturers(facultyId));
       setLecturers(response.data);
     } else {
       setLecturers([]);
     }
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -38,6 +43,7 @@ function StudentThesis() {
   }, [thesis.facultyId]);
 
   useEffect(() => {
+    setLoading(true);
     const fetchFaculties = async () => {
       const response = await Apis.get(endpoints.faculties);
       setFaculties(response.data);
@@ -57,6 +63,7 @@ function StudentThesis() {
     if (user.id) {
       fetchThesis();
     }
+    setLoading(false);
   }, []);
 
   const handleLecturerChange = (field, value) => {
@@ -105,6 +112,7 @@ function StudentThesis() {
 
   const handleSubmit = async () => {
     if (validateForm()) {
+      setLoading(true);
       const response = await authApis().post(endpoints.registerThesis, {
         name: thesis.name,
         facultyId: thesis.facultyId,
@@ -123,9 +131,11 @@ function StudentThesis() {
       }
       if (response.data && response1.data) {
         alert("Đăng ký đề tài thành công");
+        navigate(0);
       } else {
         alert("Đăng ký đề tài thất bại");
       }
+      setLoading(false);
     }
   };
 

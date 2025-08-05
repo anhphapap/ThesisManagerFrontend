@@ -8,11 +8,11 @@ export const endpoints = {
   login: "/login",
   profile: "/secure/profile",
   faculties: "/faculties",
-  lecturers: (facultyId) => `/faculty/${facultyId}/lecturer`,
-  studentThesis: (studentId) => `/students/${studentId}/thesis`,
-  registerThesis: "/secure/thesis/add",
-  registerInstructor: "/secure/instructor/add",
-  getInstructor: (thesisId) => `/secure/thesis/${thesisId}/instructors`,
+  lecturers: (facultyId) => `/faculties/${facultyId}/lecturers`,
+  studentThesis: (studentId) => `/students/${studentId}/theses`,
+  registerThesis: "/secure/theses/add",
+  registerInstructor: "/secure/instructors/add",
+  getInstructor: (thesisId) => `/secure/theses/${thesisId}/instructors`,
 };
 
 export const authApis = () =>

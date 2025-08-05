@@ -2,13 +2,21 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { UserContext } from "./configs/Contexts";
 import UserReducer from "./reducers/UserReducer";
 import Login from "./components/Login";
-import { useReducer } from "react";
+import { useReducer, useEffect } from "react";
 import Lecturer from "./components/views/lecturer/Lecturer";
 import Base from "./components/Base";
 import StudentThesis from "./components/views/student/StudentThesis";
 import StaffThesis from "./components/views/staff/StaffThesis";
 const App = () => {
-  let [user, dispatch] = useReducer(UserReducer, null);
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+  let [user, dispatch] = useReducer(UserReducer, storedUser || null);
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem("user", JSON.stringify(user));
+    } else {
+      localStorage.removeItem("user");
+    }
+  }, [user]);
   console.log("user", user);
   return (
     <UserContext.Provider value={[user, dispatch]}>
