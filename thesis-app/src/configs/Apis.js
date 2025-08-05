@@ -9,10 +9,12 @@ export const endpoints = {
   profile: "/secure/profile",
   faculties: "/faculties",
   lecturers: (facultyId) => `/faculties/${facultyId}/lecturers`,
+  councils: `/councils`,
   studentThesis: (studentId) => `/students/${studentId}/theses`,
-  registerThesis: "/secure/theses/add",
-  registerInstructor: "/secure/instructors/add",
-  getInstructor: (thesisId) => `/secure/theses/${thesisId}/instructors`,
+  registerThesis: "/theses/add",
+  getInstructor: (thesisId) => `/theses/${thesisId}/instructors`,
+  theses: "/theses",
+  thesisDetail: (thesisId) => `/theses/${thesisId}`,
 };
 
 export const authApis = () =>

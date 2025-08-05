@@ -53,11 +53,8 @@ function StudentThesis() {
       const response = await Apis.get(endpoints.studentThesis(user.id));
       if (response.data) {
         setThesis(response.data);
+        console.log(response.data);
         setRegistered(true);
-        const response1 = await authApis().get(
-          endpoints.getInstructor(response.data.id)
-        );
-        setLecturers(response1.data);
       }
     };
     if (user.id) {
@@ -112,28 +109,17 @@ function StudentThesis() {
 
   const handleSubmit = async () => {
     if (validateForm()) {
-      setLoading(true);
-      const response = await authApis().post(endpoints.registerThesis, {
-        name: thesis.name,
-        facultyId: thesis.facultyId,
-        studentId: user.id,
-      });
-      var thesisId = response.data.id;
-      const response1 = await authApis().post(endpoints.registerInstructor, {
-        thesisId: thesisId,
-        lecturerId: thesis.lecturer1Id,
-      });
-      if (thesis.lecturer2Id !== "") {
-        const response2 = await authApis().post(endpoints.registerInstructor, {
-          thesisId: thesisId,
-          lecturerId: thesis.lecturer2Id,
+      try {
+        const response = await authApis().post(endpoints.registerThesis, {
+          ...thesis,
+          studentId: user.id,
         });
-      }
-      if (response.data && response1.data) {
-        alert("Đăng ký đề tài thành công");
-        navigate(0);
-      } else {
-        alert("Đăng ký đề tài thất bại");
+        if (response.data) {
+          alert("Đăng ký đề tài thành công");
+          navigate(0);
+        }
+      } catch (err) {
+        alert(err.response?.data?.message || "Đã xảy ra lỗi!");
       }
       setLoading(false);
     }
@@ -289,13 +275,13 @@ function StudentThesis() {
                 <input
                   type="text"
                   className={`form-control`}
-                  value={thesis.facultyId.name}
+                  value={thesis.facultyName}
                   disabled={true}
                   readOnly={true}
                 />
               </div>
               <div className="row">
-                {lecturers.map((lecturer, index) => (
+                {thesis.listInstructor.map((lecturer, index) => (
                   <div className="col" key={"lecturer-" + lecturer.id}>
                     <label htmlFor="name" className="form-label">
                       Giảng viên hướng dẫn {index + 1}
@@ -303,7 +289,7 @@ function StudentThesis() {
                     <input
                       type="text"
                       className={`form-control`}
-                      value={lecturer.fullName}
+                      value={lecturer.name}
                       disabled={true}
                       readOnly={true}
                     />
