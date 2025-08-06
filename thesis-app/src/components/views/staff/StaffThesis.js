@@ -3,6 +3,7 @@ import Base from "../../Base";
 import Apis, { endpoints } from "../../../configs/Apis";
 import { PencilSquare, EyeFill } from "react-bootstrap-icons";
 import { Modal, Button, Form, Col, Row, Spinner } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
 function StaffThesis() {
   const [theses, setTheses] = useState([]);
@@ -13,6 +14,7 @@ function StaffThesis() {
   const [lecturers, setLecturers] = useState([]);
   const [viewLoading, setViewLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
 
   const handleViewDetail = async (thesisId) => {
     setViewLoading(true);
@@ -73,13 +75,7 @@ function StaffThesis() {
     const isValid = await validateForm();
     if (isValid) {
       try {
-        console.log({
-          ...thesisDetail,
-          status: "ACCEPTED",
-          lecturer1Id: thesisDetail?.listInstructor[0]?.id,
-          lecturer2Id: thesisDetail?.listInstructor[1]?.id,
-        });
-        const response = await Apis.post(endpoints.registerThesis, {
+        const response = await Apis.put(endpoints.updateThesis, {
           ...thesisDetail,
           status: "ACCEPTED",
           lecturer1Id: thesisDetail?.listInstructor[0]?.id,
@@ -87,6 +83,7 @@ function StaffThesis() {
         });
         if (response.data) {
           alert("Phê duyệt thành công");
+          navigate(0);
           setShowDetail(false);
         }
       } catch (error) {
@@ -138,7 +135,7 @@ function StaffThesis() {
                         <Form.Control
                           type="text"
                           value={thesisDetail?.id}
-                          disabled
+                          readOnly
                         />
                       </Form.Group>
                     </Col>
@@ -151,7 +148,7 @@ function StaffThesis() {
                         <Form.Control
                           type="text"
                           value={thesisDetail?.name}
-                          disabled
+                          readOnly
                         />
                       </Form.Group>
                     </Col>
@@ -166,7 +163,7 @@ function StaffThesis() {
                         <Form.Control
                           type="text"
                           value={thesisDetail?.studentName}
-                          disabled
+                          readOnly
                         />
                       </Form.Group>
                     </Col>
@@ -179,7 +176,7 @@ function StaffThesis() {
                         <Form.Control
                           type="text"
                           value={thesisDetail?.facultyName}
-                          disabled
+                          readOnly
                         />
                       </Form.Group>
                     </Col>
@@ -206,59 +203,99 @@ function StaffThesis() {
                           ? "text-warning"
                           : "text-danger"
                       }
-                      disabled
+                      readOnly
                     />
                   </Form.Group>
-                  {thesisDetail?.listInstructor.map((instructor, index) => (
-                    <Form.Group
-                      className="mb-3"
-                      controlId="exampleForm.ControlInput1"
-                    >
-                      <Form.Label>Giảng viên hướng dẫn {index + 1}</Form.Label>
-                      <Form.Select
-                        aria-label="Default select example"
-                        value={instructor.id}
-                        disabled={thesisDetail?.status !== "WAITING"}
-                        onChange={(e) =>
-                          handleChangeInstructor(e.target.value, index)
-                        }
-                      >
-                        {lecturers.map((lecturer) => (
-                          <option
-                            key={"lecturer" + lecturer.id}
-                            value={lecturer.id}
+                  {thesisDetail?.status === "WAITING" ? (
+                    <>
+                      {thesisDetail?.listInstructor.map((instructor, index) => (
+                        <Form.Group
+                          className="mb-3"
+                          controlId="exampleForm.ControlInput1"
+                        >
+                          <Form.Label>
+                            Giảng viên hướng dẫn {index + 1}
+                          </Form.Label>
+                          <Form.Select
+                            aria-label="Default select example"
+                            value={instructor.id}
+                            readOnly={thesisDetail?.status !== "WAITING"}
+                            onChange={(e) =>
+                              handleChangeInstructor(e.target.value, index)
+                            }
                           >
-                            {lecturer.fullName}
-                          </option>
-                        ))}
-                      </Form.Select>
-                    </Form.Group>
-                  ))}
-                  <Form.Group
-                    className="mb-3"
-                    controlId="exampleForm.ControlInput1"
-                  >
-                    <Form.Label>Hội đồng</Form.Label>
-                    <Form.Select
-                      aria-label="Default select example"
-                      value={thesisDetail?.councilId}
-                      disabled={thesisDetail?.status !== "WAITING"}
-                      onChange={(e) => handleChangeCouncil(e.target.value)}
-                      isInvalid={!!errors.councilId}
-                    >
-                      <option value="">Chọn hội đồng</option>
-                      {councils.map((council) => (
-                        <option key={"council" + council.id} value={council.id}>
-                          {council.name}
-                        </option>
+                            {lecturers.map((lecturer) => (
+                              <option
+                                key={"lecturer" + lecturer.id}
+                                value={lecturer.id}
+                              >
+                                {lecturer.fullName}
+                              </option>
+                            ))}
+                          </Form.Select>
+                        </Form.Group>
                       ))}
-                    </Form.Select>
-                    {errors.councilId && (
-                      <Form.Control.Feedback type="invalid">
-                        {errors.councilId}
-                      </Form.Control.Feedback>
-                    )}
-                  </Form.Group>
+                      <Form.Group
+                        className="mb-3"
+                        controlId="exampleForm.ControlInput1"
+                      >
+                        <Form.Label>Hội đồng</Form.Label>
+                        <Form.Select
+                          aria-label="Default select example"
+                          value={thesisDetail?.councilId}
+                          readOnly={thesisDetail?.status !== "WAITING"}
+                          onChange={(e) => handleChangeCouncil(e.target.value)}
+                          isInvalid={!!errors.councilId}
+                        >
+                          <option value="">Chọn hội đồng</option>
+                          {councils.map((council) => (
+                            <option
+                              key={"council" + council.id}
+                              value={council.id}
+                            >
+                              {council.name}
+                            </option>
+                          ))}
+                        </Form.Select>
+                        {errors.councilId && (
+                          <Form.Control.Feedback type="invalid">
+                            {errors.councilId}
+                          </Form.Control.Feedback>
+                        )}
+                      </Form.Group>
+                    </>
+                  ) : (
+                    <>
+                      {thesisDetail?.listInstructor.map((instructor, index) => (
+                        <Form.Group
+                          className="mb-3"
+                          controlId="exampleForm.ControlInput1"
+                        >
+                          <Form.Label>
+                            Giảng viên hướng dẫn {index + 1}
+                          </Form.Label>
+                          <Form.Control
+                            aria-label="Default select example"
+                            value={instructor.name}
+                            readOnly
+                            type="text"
+                          />
+                        </Form.Group>
+                      ))}
+                      <Form.Group
+                        className="mb-3"
+                        controlId="exampleForm.ControlInput1"
+                      >
+                        <Form.Label>Hội đồng chấm</Form.Label>
+                        <Form.Control
+                          aria-label="Default select example"
+                          value={thesisDetail?.councilName || "Đang chờ duyệt"}
+                          readOnly
+                          type="text"
+                        />
+                      </Form.Group>
+                    </>
+                  )}
                   {errors.listInstructor && (
                     <div className="alert alert-danger" role="alert">
                       {errors.listInstructor}

@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { Navbar, Container, Nav } from "react-bootstrap";
+import { Navbar, Container, Nav, NavDropdown } from "react-bootstrap";
 import { PersonCircle } from "react-bootstrap-icons";
 import { UserContext } from "../../configs/Contexts";
 import { useNavigate } from "react-router-dom";
@@ -40,8 +40,31 @@ const Header = () => {
           ) : (
             <PersonCircle size={28} className="me-2 text-white" />
           )}
-          <span className="text-white">{user.fullName}</span>
-          <button
+          <Navbar.Collapse id="navbar-dark-example">
+            <Nav>
+              <NavDropdown
+                id="nav-dropdown-dark-example"
+                title={user.fullName}
+                menuVariant="dark"
+                drop="down-centered"
+                align="end"
+              >
+                <NavDropdown.Item onClick={() => navigate("/profile")}>
+                  Thông tin cá nhân
+                </NavDropdown.Item>
+                <NavDropdown.Divider />
+                <NavDropdown.Item
+                  onClick={() => {
+                    dispatch({ type: "logout" });
+                    navigate("/login");
+                  }}
+                >
+                  Đăng xuất
+                </NavDropdown.Item>
+              </NavDropdown>
+            </Nav>
+          </Navbar.Collapse>
+          {/* <button
             className="text-white btn btn-danger ms-2"
             onClick={() => {
               dispatch({ type: "logout" });
@@ -49,7 +72,7 @@ const Header = () => {
             }}
           >
             <span>Đăng xuất</span>
-          </button>
+          </button> */}
         </Nav>
       </Container>
     </Navbar>

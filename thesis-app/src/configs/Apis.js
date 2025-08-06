@@ -10,11 +10,16 @@ export const endpoints = {
   faculties: "/faculties",
   lecturers: (facultyId) => `/faculties/${facultyId}/lecturers`,
   councils: `/councils`,
-  studentThesis: (studentId) => `/students/${studentId}/theses`,
+  studentThesis: `/secure/students/theses`,
+  lecturerThesis: `/secure/lecturers/instructor/theses`,
   registerThesis: "/theses/add",
+  updateThesis: "/theses/update",
+  thesisUpload: (thesisId) => `/theses/${thesisId}/upload`,
   getInstructor: (thesisId) => `/theses/${thesisId}/instructors`,
   theses: "/theses",
   thesisDetail: (thesisId) => `/theses/${thesisId}`,
+  updateUser: "/user/update",
+  changePassword: "/user/change-password",
 };
 
 export const authApis = () =>

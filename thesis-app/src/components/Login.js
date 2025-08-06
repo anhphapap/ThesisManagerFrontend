@@ -62,7 +62,7 @@ const Login = () => {
         if (role === "student") {
           nav("/students/thesis");
         } else if (role === "lecturer") {
-          nav("/lecturers");
+          nav("/lecturers/thesis");
         } else {
           nav("/staff/thesis");
         }

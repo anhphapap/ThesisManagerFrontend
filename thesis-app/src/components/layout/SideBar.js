@@ -16,14 +16,14 @@ const Sidebar = () => {
   const menuItems = [
     {
       icon: <FileEarmarkText />,
-      label: "Quản lý khóa luận",
+      label: "Khóa luận của tôi",
       path: "/students/thesis",
       role: "STUDENT",
     },
     {
-      icon: <PeopleFill />,
-      label: "Quản lý hội đồng",
-      path: "/lecturers",
+      icon: <FileEarmarkText />,
+      label: "Khóa luận hướng dẫn",
+      path: "/lecturers/thesis",
       role: "ROLE_USER",
     },
     {

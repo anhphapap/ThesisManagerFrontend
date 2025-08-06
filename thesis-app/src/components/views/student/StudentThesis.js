@@ -43,24 +43,28 @@ function StudentThesis() {
   }, [thesis.facultyId]);
 
   useEffect(() => {
-    setLoading(true);
     const fetchFaculties = async () => {
+      setLoading(true);
       const response = await Apis.get(endpoints.faculties);
       setFaculties(response.data);
+      setLoading(false);
     };
     fetchFaculties();
     const fetchThesis = async () => {
-      const response = await Apis.get(endpoints.studentThesis(user.id));
-      if (response.data) {
-        setThesis(response.data);
-        console.log(response.data);
-        setRegistered(true);
-      }
+      setLoading(true);
+      try {
+        const response = await authApis().get(endpoints.studentThesis);
+        if (response.data) {
+          setThesis(response.data);
+          console.log(response.data);
+          setRegistered(true);
+        }
+      } catch (err) {}
+      setLoading(false);
     };
     if (user.id) {
       fetchThesis();
     }
-    setLoading(false);
   }, []);
 
   const handleLecturerChange = (field, value) => {
@@ -82,6 +86,14 @@ function StudentThesis() {
 
   const validateForm = () => {
     const newErrors = {};
+
+    if (registered) {
+      if (!thesis.file) {
+        newErrors.file = "Vui lòng chọn file khóa luận";
+      }
+      setErrors(newErrors);
+      return Object.keys(newErrors).length === 0;
+    }
 
     if (!thesis.name.trim()) {
       newErrors.name = "Tên đề tài là bắt buộc";
@@ -108,19 +120,45 @@ function StudentThesis() {
   };
 
   const handleSubmit = async () => {
+    setLoading(true);
     if (validateForm()) {
       try {
-        const response = await authApis().post(endpoints.registerThesis, {
-          ...thesis,
-          studentId: user.id,
-        });
-        if (response.data) {
-          alert("Đăng ký đề tài thành công");
-          navigate(0);
+        if (registered) {
+          if (thesis.file) {
+            const formData = new FormData();
+            formData.append("id", thesis.id);
+            formData.append("file", thesis.file);
+            const response = await authApis().post(
+              endpoints.thesisUpload(thesis.id),
+              formData
+            );
+            if (response.data) {
+              alert("Nộp khóa luận thành công");
+              navigate(0);
+            }
+          } else {
+            setErrors((prev) => ({
+              ...prev,
+              file: "Vui lòng chọn file khóa luận",
+            }));
+            setLoading(false);
+            return;
+          }
+        } else {
+          const response = await authApis().post(endpoints.registerThesis, {
+            ...thesis,
+            studentId: user.id,
+          });
+          if (response.data) {
+            alert("Đăng ký đề tài thành công");
+            navigate(0);
+          }
         }
       } catch (err) {
         alert(err.response?.data?.message || "Đã xảy ra lỗi!");
       }
+      setLoading(false);
+    } else {
       setLoading(false);
     }
   };
@@ -141,164 +179,225 @@ function StudentThesis() {
               : "Chưa đăng ký"}
           </span>
         </div>
-        <div className="mt-4">
-          <div className="mb-3">
-            <label htmlFor="name" className="form-label">
-              Tên đề tài *
-            </label>
-            <input
-              type="text"
-              className={`form-control ${errors.name ? "is-invalid" : ""}`}
-              name="name"
-              placeholder="Nhập tên đề tài"
-              value={thesis.name}
-              onChange={(e) => {
-                setThesis({ ...thesis, name: e.target.value });
-                if (errors.name) {
-                  setErrors((prev) => ({ ...prev, name: "" }));
-                }
-              }}
-              disabled={registered}
-              readOnly={registered}
-            />
-            {errors.name && (
-              <div className="invalid-feedback">{errors.name}</div>
-            )}
+        {loading ? (
+          <div className="d-flex justify-content-center">
+            <div className="spinner-border" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
           </div>
-          {!registered && (
-            <>
-              <div className="mb-3">
-                <label htmlFor="facultyId" className="form-label">
-                  Khoa *
-                </label>
-                <select
-                  className={`form-select ${
-                    errors.facultyId ? "is-invalid" : ""
-                  }`}
-                  aria-label="Default select example"
-                  name="facultyId"
-                  value={thesis.facultyId}
-                  onChange={(e) => {
-                    setThesis({ ...thesis, facultyId: e.target.value });
-                    if (errors.facultyId) {
-                      setErrors((prev) => ({ ...prev, facultyId: "" }));
-                    }
-                  }}
-                >
-                  <option value="">Chọn khoa</option>
-                  {faculties.map((faculty) => (
-                    <option value={faculty.id} key={"faculty-" + faculty.id}>
-                      {faculty.name}
-                    </option>
-                  ))}
-                </select>
-                {errors.facultyId && (
-                  <div className="invalid-feedback">{errors.facultyId}</div>
-                )}
-              </div>
-              <div className="row">
-                <div className="col">
-                  <label htmlFor="lecturer1Id" className="form-label">
-                    Giảng viên hướng dẫn 1 *
+        ) : (
+          <div className="mt-4">
+            <div className="mb-3">
+              <label htmlFor="name" className="form-label">
+                Tên đề tài *
+              </label>
+              <input
+                type="text"
+                className={`form-control ${errors.name ? "is-invalid" : ""}`}
+                name="name"
+                placeholder="Nhập tên đề tài"
+                value={thesis.name}
+                onChange={(e) => {
+                  setThesis({ ...thesis, name: e.target.value });
+                  if (errors.name) {
+                    setErrors((prev) => ({ ...prev, name: "" }));
+                  }
+                }}
+                disabled={registered}
+                readOnly={registered}
+              />
+              {errors.name && (
+                <div className="invalid-feedback">{errors.name}</div>
+              )}
+            </div>
+            {!registered && (
+              <>
+                <div className="mb-3">
+                  <label htmlFor="facultyId" className="form-label">
+                    Khoa *
                   </label>
                   <select
                     className={`form-select ${
-                      errors.lecturer1Id ? "is-invalid" : ""
+                      errors.facultyId ? "is-invalid" : ""
                     }`}
                     aria-label="Default select example"
-                    name="lecturer1Id"
-                    value={thesis.lecturer1Id}
-                    onChange={(e) =>
-                      handleLecturerChange("lecturer1Id", e.target.value)
-                    }
+                    name="facultyId"
+                    value={thesis.facultyId}
+                    onChange={(e) => {
+                      setThesis({ ...thesis, facultyId: e.target.value });
+                      if (errors.facultyId) {
+                        setErrors((prev) => ({ ...prev, facultyId: "" }));
+                      }
+                    }}
                   >
-                    <option value="">Chọn giảng viên</option>
-                    {lecturers?.map((lecturer) => (
-                      <option
-                        value={lecturer.id}
-                        key={"lecturer1-" + lecturer.id}
-                      >
-                        {lecturer.fullName}
+                    <option value="">Chọn khoa</option>
+                    {faculties.map((faculty) => (
+                      <option value={faculty.id} key={"faculty-" + faculty.id}>
+                        {faculty.name}
                       </option>
                     ))}
                   </select>
-                  {errors.lecturer1Id && (
-                    <div className="invalid-feedback">{errors.lecturer1Id}</div>
+                  {errors.facultyId && (
+                    <div className="invalid-feedback">{errors.facultyId}</div>
                   )}
                 </div>
-                <div className="col">
-                  <label htmlFor="lecturer2Id" className="form-label">
-                    Giảng viên hướng dẫn 2
-                  </label>
-                  <select
-                    className={`form-select ${
-                      errors.lecturer2Id ? "is-invalid" : ""
-                    }`}
-                    aria-label="Default select example"
-                    name="lecturer2Id"
-                    value={thesis.lecturer2Id}
-                    onChange={(e) =>
-                      handleLecturerChange("lecturer2Id", e.target.value)
-                    }
-                    disabled={activeLecturer}
-                  >
-                    <option value="">Chọn giảng viên</option>
-                    {lecturers
-                      .filter((lecturer) => lecturer.id !== thesis.lecturer1Id)
-                      .map((lecturer) => (
+                <div className="row">
+                  <div className="col">
+                    <label htmlFor="lecturer1Id" className="form-label">
+                      Giảng viên hướng dẫn 1 *
+                    </label>
+                    <select
+                      className={`form-select ${
+                        errors.lecturer1Id ? "is-invalid" : ""
+                      }`}
+                      aria-label="Default select example"
+                      name="lecturer1Id"
+                      value={thesis.lecturer1Id}
+                      onChange={(e) =>
+                        handleLecturerChange("lecturer1Id", e.target.value)
+                      }
+                    >
+                      <option value="">Chọn giảng viên</option>
+                      {lecturers?.map((lecturer) => (
                         <option
                           value={lecturer.id}
-                          key={"lecturer2-" + lecturer.id}
+                          key={"lecturer1-" + lecturer.id}
                         >
                           {lecturer.fullName}
                         </option>
                       ))}
-                  </select>
-                  {errors.lecturer2Id && (
-                    <div className="invalid-feedback">{errors.lecturer2Id}</div>
-                  )}
-                </div>
-              </div>
-              <div className="mt-4 d-flex justify-content-center">
-                <button className="btn btn-primary" onClick={handleSubmit}>
-                  Đăng ký
-                </button>
-              </div>
-            </>
-          )}
-          {registered && (
-            <>
-              <div className="mb-3">
-                <label htmlFor="name" className="form-label">
-                  Khoa *
-                </label>
-                <input
-                  type="text"
-                  className={`form-control`}
-                  value={thesis.facultyName}
-                  disabled={true}
-                  readOnly={true}
-                />
-              </div>
-              <div className="row">
-                {thesis.listInstructor.map((lecturer, index) => (
-                  <div className="col" key={"lecturer-" + lecturer.id}>
-                    <label htmlFor="name" className="form-label">
-                      Giảng viên hướng dẫn {index + 1}
-                    </label>
-                    <input
-                      type="text"
-                      className={`form-control`}
-                      value={lecturer.name}
-                      disabled={true}
-                      readOnly={true}
-                    />
+                    </select>
+                    {errors.lecturer1Id && (
+                      <div className="invalid-feedback">
+                        {errors.lecturer1Id}
+                      </div>
+                    )}
                   </div>
-                ))}
-              </div>
-            </>
-          )}
-        </div>
+                  <div className="col">
+                    <label htmlFor="lecturer2Id" className="form-label">
+                      Giảng viên hướng dẫn 2
+                    </label>
+                    <select
+                      className={`form-select ${
+                        errors.lecturer2Id ? "is-invalid" : ""
+                      }`}
+                      aria-label="Default select example"
+                      name="lecturer2Id"
+                      value={thesis.lecturer2Id}
+                      onChange={(e) =>
+                        handleLecturerChange("lecturer2Id", e.target.value)
+                      }
+                      disabled={activeLecturer}
+                    >
+                      <option value="">Chọn giảng viên</option>
+                      {lecturers
+                        .filter(
+                          (lecturer) => lecturer.id !== thesis.lecturer1Id
+                        )
+                        .map((lecturer) => (
+                          <option
+                            value={lecturer.id}
+                            key={"lecturer2-" + lecturer.id}
+                          >
+                            {lecturer.fullName}
+                          </option>
+                        ))}
+                    </select>
+                    {errors.lecturer2Id && (
+                      <div className="invalid-feedback">
+                        {errors.lecturer2Id}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className="mt-4 d-flex justify-content-center">
+                  <button className="btn btn-primary" onClick={handleSubmit}>
+                    Đăng ký
+                  </button>
+                </div>
+              </>
+            )}
+            {registered && (
+              <>
+                <div className="mb-3">
+                  <label htmlFor="name" className="form-label">
+                    Khoa *
+                  </label>
+                  <input
+                    type="text"
+                    className={`form-control`}
+                    value={thesis.facultyName}
+                    disabled={true}
+                    readOnly={true}
+                  />
+                </div>
+                <div className="mb-3">
+                  {thesis.listInstructor.map((lecturer, index) => (
+                    <div className="col mb-3" key={"lecturer-" + lecturer.id}>
+                      <label htmlFor="name" className="form-label">
+                        Giảng viên hướng dẫn {index + 1}
+                      </label>
+                      <input
+                        type="text"
+                        className={`form-control`}
+                        value={lecturer.name}
+                        disabled={true}
+                        readOnly={true}
+                      />
+                    </div>
+                  ))}
+                </div>
+                {thesis.status === "WAITING" && (
+                  <span className="text-danger fs-6">
+                    *Bạn có thể nộp báo cáo sau khi khóa luận được duyệt
+                  </span>
+                )}
+                {thesis.status === "ACCEPTED" && (
+                  <>
+                    <div className="mb-3">
+                      <label htmlFor="name" className="form-label">
+                        File khóa luận *
+                      </label>
+                      {thesis.submissionFile && (
+                        <a
+                          href={thesis.submissionFile}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {thesis.submissionFile}
+                        </a>
+                      )}
+                      <input
+                        type="file"
+                        className={`mt-3 form-control ${
+                          errors.file ? "is-invalid" : ""
+                        }`}
+                        onChange={(e) => {
+                          setThesis({ ...thesis, file: e.target.files[0] });
+                          if (errors.file) {
+                            setErrors((prev) => ({ ...prev, file: "" }));
+                          }
+                        }}
+                      />
+                      {errors.file && (
+                        <div className="invalid-feedback">{errors.file}</div>
+                      )}
+                    </div>
+                    <div className="mt-4 d-flex justify-content-center">
+                      <button
+                        className="btn btn-primary"
+                        onClick={handleSubmit}
+                        disabled={loading}
+                      >
+                        Nộp khóa luận
+                      </button>
+                    </div>
+                  </>
+                )}
+              </>
+            )}
+          </div>
+        )}
       </div>
     </Base>
   );
