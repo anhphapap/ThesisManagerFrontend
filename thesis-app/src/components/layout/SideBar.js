@@ -39,6 +39,12 @@ const Sidebar = () => {
       path: "/lecturers/thesis",
       role: "ROLE_USER",
     },
+    {
+      icon: <PeopleFill />,
+      label: "Khóa luận phản biện",
+      path: "/lecturers/reviewer",
+      role: "ROLE_USER",
+    }
   ];
 
   return (
