@@ -3,6 +3,7 @@ import { UserContext } from "./configs/Contexts";
 import UserReducer from "./reducers/UserReducer";
 import Login from "./components/Login";
 
+import Lecturer from "./components/views/lecturer/LecturerThesisReviewer";
 import Council from "./components/views/staff/Council";
 import LecturerThesis from "./components/views/lecturer/LecturerThesis";
 import Base from "./components/Base";
@@ -11,6 +12,7 @@ import StaffThesis from "./components/views/staff/StaffThesis";
 import Profile from "./components/views/Profile";
 import ProtectedLayout from "./components/layout/ProtectedLayout";
 import { useReducer, useEffect } from "react";
+import LecturerThesisReviewer from "./components/views/lecturer/LecturerThesisReviewer";
 
 const App = () => {
   const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -52,6 +54,10 @@ const App = () => {
               }
             >
               <Route path="/lecturers/thesis" element={<LecturerThesis />} />
+              <Route
+                path="/lecturers/reviewer"
+                element={<LecturerThesisReviewer />}
+              />
             </Route>
 
             <Route

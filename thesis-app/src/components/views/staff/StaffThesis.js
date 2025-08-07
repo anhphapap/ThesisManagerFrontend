@@ -9,6 +9,8 @@ import {
   Funnel,
   Search,
   ArrowClockwise,
+  FileEarmarkPdf,
+  Download,
 } from "react-bootstrap-icons";
 import {
   Modal,
@@ -89,6 +91,20 @@ function StaffThesis() {
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
+  };
+
+  const handleExportPdf = async (thesisId) => {
+    try {
+      const response = await Apis.get(endpoints.exportPdf(thesisId), {
+        responseType: "blob",
+      });
+
+      const blob = new Blob([response.data], { type: "application/pdf" });
+      const pdfUrl = window.URL.createObjectURL(blob);
+      window.open(pdfUrl);
+    } catch (error) {
+      console.error("Error viewing PDF:", error);
+    }
   };
 
   const handleApprove = async () => {
@@ -455,6 +471,16 @@ function StaffThesis() {
                             <EyeFill />
                           )}
                         </button>
+                        {thesis.status === "COMPLETED" && (
+                          <Button
+                            variant="danger"
+                            title="Xuất PDF"
+                            className="d-flex align-items-center justify-content-center p-2"
+                            onClick={() => handleExportPdf(thesis.id)}
+                          >
+                            <Download size={14} />
+                          </Button>
+                        )}
                       </div>
                     </td>
                   </tr>
