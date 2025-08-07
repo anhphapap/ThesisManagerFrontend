@@ -3,6 +3,7 @@ import Base from "../../../components/Base";
 import Apis, { authApis, endpoints } from "../../../configs/Apis";
 import { UserContext } from "../../../configs/Contexts";
 import { useNavigate } from "react-router-dom";
+import { Form } from "react-bootstrap";
 
 function StudentThesis() {
   const [user] = useContext(UserContext);
@@ -164,7 +165,7 @@ function StudentThesis() {
   };
 
   return (
-    <Base>
+    <>
       <div className="container d-flex flex-column justify-content-center">
         <div className="d-flex justify-content-between align-items-center">
           <h3 className="fw-bold">Khóa luận của tôi</h3>
@@ -358,7 +359,7 @@ function StudentThesis() {
                       <label htmlFor="name" className="form-label">
                         File khóa luận *
                       </label>
-                      {thesis.submissionFile && (
+                      {thesis.submissionFile ? (
                         <a
                           href={thesis.submissionFile}
                           target="_blank"
@@ -366,6 +367,10 @@ function StudentThesis() {
                         >
                           {thesis.submissionFile}
                         </a>
+                      ) : (
+                        <span className="text-danger fw-bold">
+                          Bạn chưa nộp file khóa luận
+                        </span>
                       )}
                       <input
                         type="file"
@@ -394,12 +399,40 @@ function StudentThesis() {
                     </div>
                   </>
                 )}
+                {thesis.status === "COMPLETED" && (
+                  <>
+                    <Form.Group
+                      className="mb-3"
+                      controlId="exampleForm.ControlInput1"
+                    >
+                      <Form.Label>File khóa luận</Form.Label>
+                      <Form.Control
+                        aria-label="Default select example"
+                        value={thesis?.submissionFile || "Chưa nộp"}
+                        readOnly
+                        type="text"
+                      />
+                    </Form.Group>
+                    <Form.Group
+                      className="mb-3"
+                      controlId="exampleForm.ControlInput1"
+                    >
+                      <Form.Label>Điểm trung bình</Form.Label>
+                      <Form.Control
+                        aria-label="Default select example"
+                        value={thesis?.avgScore || "Chưa chấm"}
+                        readOnly
+                        type="text"
+                      />
+                    </Form.Group>
+                  </>
+                )}
               </>
             )}
           </div>
         )}
       </div>
-    </Base>
+    </>
   );
 }
 

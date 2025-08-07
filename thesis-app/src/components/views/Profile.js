@@ -76,7 +76,7 @@ function Profile() {
   };
 
   return (
-    <Base>
+    <>
       <div className="d-flex flex-column justify-content-center">
         <div className="d-flex justify-content-between align-items-center mb-2">
           <h3 className="fw-bold">Thông tin cá nhân</h3>
@@ -256,7 +256,7 @@ function Profile() {
           </Col>
         </Row>
       </div>
-    </Base>
+    </>
   );
 }
 

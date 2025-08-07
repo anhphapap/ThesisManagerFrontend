@@ -3,7 +3,6 @@ import { UserContext } from "./configs/Contexts";
 import UserReducer from "./reducers/UserReducer";
 import Login from "./components/Login";
 
-import Lecturer from "./components/views/lecturer/Lecturer";
 import Council from "./components/views/staff/Council";
 import LecturerThesis from "./components/views/lecturer/LecturerThesis";
 import Base from "./components/Base";
@@ -21,65 +20,69 @@ const App = () => {
   return (
     <UserContext.Provider value={[user, dispatch]}>
       <BrowserRouter>
-        <Routes>
-          <Route
-            path="/login"
-            element={user ? <Navigate to={"/"} /> : <Login />}
-          />
+        <Base>
+          <Routes>
+            <Route
+              path="/login"
+              element={user ? <Navigate to={"/"} /> : <Login />}
+            />
 
-          <Route
-            element={
-              <ProtectedLayout
-                user={user}
-                allowedRoles={["STUDENT", "ROLE_USER", "ROLE_STAFF"]}
-              />
-            }
-          >
-            <Route path="/profile" element={<Profile />} />
-          </Route>
+            <Route
+              element={
+                <ProtectedLayout
+                  user={user}
+                  allowedRoles={["STUDENT", "ROLE_USER", "ROLE_STAFF"]}
+                />
+              }
+            >
+              <Route path="/profile" element={<Profile />} />
+            </Route>
 
-          <Route
-            element={<ProtectedLayout user={user} allowedRoles={["STUDENT"]} />}
-          >
-            <Route path="/students/thesis" element={<StudentThesis />} />
-          </Route>
+            <Route
+              element={
+                <ProtectedLayout user={user} allowedRoles={["STUDENT"]} />
+              }
+            >
+              <Route path="/students/thesis" element={<StudentThesis />} />
+            </Route>
 
-          <Route
-            element={
-              <ProtectedLayout user={user} allowedRoles={["ROLE_USER"]} />
-            }
-          >
-            <Route path="/lecturers/thesis" element={<LecturerThesis />} />
-          </Route>
+            <Route
+              element={
+                <ProtectedLayout user={user} allowedRoles={["ROLE_USER"]} />
+              }
+            >
+              <Route path="/lecturers/thesis" element={<LecturerThesis />} />
+            </Route>
 
-          <Route
-            element={
-              <ProtectedLayout user={user} allowedRoles={["ROLE_STAFF"]} />
-            }
-          >
-            <Route path="/staff/thesis" element={<StaffThesis />} />
-            <Route path="/staff/councils" element={<Council />} />
-          </Route>
+            <Route
+              element={
+                <ProtectedLayout user={user} allowedRoles={["ROLE_STAFF"]} />
+              }
+            >
+              <Route path="/staff/thesis" element={<StaffThesis />} />
+              <Route path="/staff/councils" element={<Council />} />
+            </Route>
 
-          <Route
-            path="*"
-            element={
-              <Navigate
-                to={
-                  user
-                    ? `/${
-                        user.role === "ROLE_USER"
-                          ? "lecturers"
-                          : user.role === "ROLE_STAFF"
-                          ? "staff"
-                          : "students"
-                      }/thesis`
-                    : "/login"
-                }
-              />
-            }
-          />
-        </Routes>
+            <Route
+              path="*"
+              element={
+                <Navigate
+                  to={
+                    user
+                      ? `/${
+                          user.role === "ROLE_USER"
+                            ? "lecturers"
+                            : user.role === "ROLE_STAFF"
+                            ? "staff"
+                            : "students"
+                        }/thesis`
+                      : "/login"
+                  }
+                />
+              }
+            />
+          </Routes>
+        </Base>
       </BrowserRouter>
     </UserContext.Provider>
   );

@@ -1,8 +1,26 @@
 import React, { useEffect, useState } from "react";
 import Base from "../../Base";
 import Apis, { endpoints } from "../../../configs/Apis";
-import { PencilSquare, EyeFill } from "react-bootstrap-icons";
-import { Modal, Button, Form, Col, Row, Spinner } from "react-bootstrap";
+import {
+  PencilSquare,
+  EyeFill,
+  ChevronLeft,
+  ChevronRight,
+  Funnel,
+  Search,
+  ArrowClockwise,
+} from "react-bootstrap-icons";
+import {
+  Modal,
+  Button,
+  Form,
+  Col,
+  Row,
+  Spinner,
+  Pagination,
+  Card,
+  InputGroup,
+} from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 function StaffThesis() {
@@ -15,6 +33,8 @@ function StaffThesis() {
   const [viewLoading, setViewLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
+  const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const handleViewDetail = async (thesisId) => {
     setViewLoading(true);
@@ -80,6 +100,7 @@ function StaffThesis() {
           status: "ACCEPTED",
           lecturer1Id: thesisDetail?.listInstructor[0]?.id,
           lecturer2Id: thesisDetail?.listInstructor[1]?.id,
+          createdAt: new Date(),
         });
         if (response.data) {
           alert("Phê duyệt thành công");
@@ -94,245 +115,305 @@ function StaffThesis() {
 
   useEffect(() => {
     setLoading(true);
-    const fetchTheses = async () => {
-      const response = await Apis.get(endpoints.theses);
-      setTheses(response.data);
-    };
+    let timer = setTimeout(() => {
+      if (currentPage > 0) fetchTheses();
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [currentPage, search]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search]);
+
+  const fetchTheses = async () => {
+    setLoading(true);
+    try {
+      const response = await Apis.get(
+        endpoints.theses + "?page=" + currentPage + "&kw=" + search
+      );
+      if (response.data.length == 0 && currentPage > 1) {
+        setCurrentPage(currentPage - 1);
+        return;
+      } else {
+        if (currentPage <= 1) setTheses(response.data);
+        else setTheses([...theses, ...response.data]);
+      }
+    } catch (error) {
+      alert(error.response?.data?.message || "Đã xảy ra lỗi!");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchTheses();
-    setLoading(false);
   }, []);
 
   return (
-    <Base>
-      {loading ? (
-        <div className="d-flex justify-content-center align-items-center">
-          <Spinner animation="border" role="status" className="text-primary" />
+    <>
+      <div className="d-flex flex-column justify-content-center">
+        <div className="d-flex justify-content-between align-items-center mb-4">
+          <h3 className="fw-bold">Danh sách khóa luận</h3>
         </div>
-      ) : (
-        <div className="d-flex flex-column justify-content-center">
-          <div className="d-flex justify-content-between align-items-center mb-4">
-            <h3 className="fw-bold">Danh sách khóa luận</h3>
-          </div>
-          <div className="bg-white p-4 rounded-3 shadow-sm">
-            <Modal
-              show={showDetail}
-              onHide={() => setShowDetail(false)}
-              size="lg"
-              centered
-            >
-              <Modal.Header closeButton>
-                <Modal.Title>Chi tiết khóa luận</Modal.Title>
-              </Modal.Header>
-              <Modal.Body>
-                <Form>
-                  <Row>
-                    <Col md={2}>
-                      <Form.Group
-                        className="mb-3"
-                        controlId="exampleForm.ControlInput1"
-                      >
-                        <Form.Label>Mã khóa luận</Form.Label>
-                        <Form.Control
-                          type="text"
-                          value={thesisDetail?.id}
-                          readOnly
-                        />
-                      </Form.Group>
-                    </Col>
-                    <Col md={10}>
-                      <Form.Group
-                        className="mb-3"
-                        controlId="exampleForm.ControlInput1"
-                      >
-                        <Form.Label>Tên khóa luận</Form.Label>
-                        <Form.Control
-                          type="text"
-                          value={thesisDetail?.name}
-                          readOnly
-                        />
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col>
-                      <Form.Group
-                        className="mb-3"
-                        controlId="exampleForm.ControlInput1"
-                      >
-                        <Form.Label>Sinh viên</Form.Label>
-                        <Form.Control
-                          type="text"
-                          value={thesisDetail?.studentName}
-                          readOnly
-                        />
-                      </Form.Group>
-                    </Col>
-                    <Col>
-                      <Form.Group
-                        className="mb-3"
-                        controlId="exampleForm.ControlInput1"
-                      >
-                        <Form.Label>Khoa</Form.Label>
-                        <Form.Control
-                          type="text"
-                          value={thesisDetail?.facultyName}
-                          readOnly
-                        />
-                      </Form.Group>
-                    </Col>
-                  </Row>
+        <div className="bg-white p-4 rounded-3 shadow-sm">
+          <Modal
+            show={showDetail}
+            onHide={() => setShowDetail(false)}
+            size="lg"
+            centered
+          >
+            <Modal.Header closeButton>
+              <Modal.Title>Chi tiết khóa luận</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <Form>
+                <Row>
+                  <Col md={2}>
+                    <Form.Group
+                      className="mb-3"
+                      controlId="exampleForm.ControlInput1"
+                    >
+                      <Form.Label>Mã khóa luận</Form.Label>
+                      <Form.Control
+                        type="text"
+                        value={thesisDetail?.id}
+                        readOnly
+                      />
+                    </Form.Group>
+                  </Col>
+                  <Col md={10}>
+                    <Form.Group
+                      className="mb-3"
+                      controlId="exampleForm.ControlInput1"
+                    >
+                      <Form.Label>Tên khóa luận</Form.Label>
+                      <Form.Control
+                        type="text"
+                        value={thesisDetail?.name}
+                        readOnly
+                      />
+                    </Form.Group>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col>
+                    <Form.Group
+                      className="mb-3"
+                      controlId="exampleForm.ControlInput1"
+                    >
+                      <Form.Label>Sinh viên</Form.Label>
+                      <Form.Control
+                        type="text"
+                        value={thesisDetail?.studentName}
+                        readOnly
+                      />
+                    </Form.Group>
+                  </Col>
+                  <Col>
+                    <Form.Group
+                      className="mb-3"
+                      controlId="exampleForm.ControlInput1"
+                    >
+                      <Form.Label>Khoa</Form.Label>
+                      <Form.Control
+                        type="text"
+                        value={thesisDetail?.facultyName}
+                        readOnly
+                      />
+                    </Form.Group>
+                  </Col>
+                </Row>
 
-                  <Form.Group
-                    className="mb-3"
-                    controlId="exampleForm.ControlInput1"
-                  >
-                    <Form.Label>Trạng thái</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={
-                        thesisDetail?.status === "WAITING"
-                          ? "Chờ duyệt"
-                          : thesisDetail?.status === "ACCEPTED"
-                          ? "Đã duyệt"
-                          : "Hoàn thành"
-                      }
-                      className={
-                        thesisDetail?.status === "WAITING"
-                          ? "text-success"
-                          : thesisDetail?.status === "ACCEPTED"
-                          ? "text-warning"
-                          : "text-danger"
-                      }
-                      readOnly
-                    />
-                  </Form.Group>
-                  {thesisDetail?.status === "WAITING" ? (
-                    <>
-                      {thesisDetail?.listInstructor.map((instructor, index) => (
-                        <Form.Group
-                          className="mb-3"
-                          controlId="exampleForm.ControlInput1"
-                        >
-                          <Form.Label>
-                            Giảng viên hướng dẫn {index + 1}
-                          </Form.Label>
-                          <Form.Select
-                            aria-label="Default select example"
-                            value={instructor.id}
-                            readOnly={thesisDetail?.status !== "WAITING"}
-                            onChange={(e) =>
-                              handleChangeInstructor(e.target.value, index)
-                            }
-                          >
-                            {lecturers.map((lecturer) => (
-                              <option
-                                key={"lecturer" + lecturer.id}
-                                value={lecturer.id}
-                              >
-                                {lecturer.fullName}
-                              </option>
-                            ))}
-                          </Form.Select>
-                        </Form.Group>
-                      ))}
+                <Form.Group
+                  className="mb-3"
+                  controlId="exampleForm.ControlInput1"
+                >
+                  <Form.Label>Trạng thái</Form.Label>
+                  <Form.Control
+                    type="text"
+                    value={
+                      thesisDetail?.status === "WAITING"
+                        ? "Chờ duyệt"
+                        : thesisDetail?.status === "ACCEPTED"
+                        ? "Đã duyệt"
+                        : "Hoàn thành"
+                    }
+                    className={
+                      thesisDetail?.status === "WAITING"
+                        ? "text-success"
+                        : thesisDetail?.status === "ACCEPTED"
+                        ? "text-warning"
+                        : "text-danger"
+                    }
+                    readOnly
+                  />
+                </Form.Group>
+                {thesisDetail?.status === "WAITING" ? (
+                  <>
+                    {thesisDetail?.listInstructor.map((instructor, index) => (
                       <Form.Group
                         className="mb-3"
                         controlId="exampleForm.ControlInput1"
                       >
-                        <Form.Label>Hội đồng</Form.Label>
+                        <Form.Label>
+                          Giảng viên hướng dẫn {index + 1}
+                        </Form.Label>
                         <Form.Select
                           aria-label="Default select example"
-                          value={thesisDetail?.councilId}
+                          value={instructor.id}
                           readOnly={thesisDetail?.status !== "WAITING"}
-                          onChange={(e) => handleChangeCouncil(e.target.value)}
-                          isInvalid={!!errors.councilId}
+                          onChange={(e) =>
+                            handleChangeInstructor(e.target.value, index)
+                          }
                         >
-                          <option value="">Chọn hội đồng</option>
-                          {councils.map((council) => (
+                          {lecturers.map((lecturer) => (
                             <option
-                              key={"council" + council.id}
-                              value={council.id}
+                              key={"lecturer" + lecturer.id}
+                              value={lecturer.id}
                             >
-                              {council.name}
+                              {lecturer.fullName}
                             </option>
                           ))}
                         </Form.Select>
-                        {errors.councilId && (
-                          <Form.Control.Feedback type="invalid">
-                            {errors.councilId}
-                          </Form.Control.Feedback>
-                        )}
                       </Form.Group>
-                    </>
-                  ) : (
-                    <>
-                      {thesisDetail?.listInstructor.map((instructor, index) => (
-                        <Form.Group
-                          className="mb-3"
-                          controlId="exampleForm.ControlInput1"
-                        >
-                          <Form.Label>
-                            Giảng viên hướng dẫn {index + 1}
-                          </Form.Label>
-                          <Form.Control
-                            aria-label="Default select example"
-                            value={instructor.name}
-                            readOnly
-                            type="text"
-                          />
-                        </Form.Group>
-                      ))}
+                    ))}
+                    <Form.Group
+                      className="mb-3"
+                      controlId="exampleForm.ControlInput1"
+                    >
+                      <Form.Label>Hội đồng</Form.Label>
+                      <Form.Select
+                        aria-label="Default select example"
+                        value={thesisDetail?.councilId}
+                        readOnly={thesisDetail?.status !== "WAITING"}
+                        onChange={(e) => handleChangeCouncil(e.target.value)}
+                        isInvalid={!!errors.councilId}
+                      >
+                        <option value="">Chọn hội đồng</option>
+                        {councils.map((council) => (
+                          <option
+                            key={"council" + council.id}
+                            value={council.id}
+                          >
+                            {council.name}
+                          </option>
+                        ))}
+                      </Form.Select>
+                      {errors.councilId && (
+                        <Form.Control.Feedback type="invalid">
+                          {errors.councilId}
+                        </Form.Control.Feedback>
+                      )}
+                    </Form.Group>
+                  </>
+                ) : (
+                  <>
+                    {thesisDetail?.listInstructor.map((instructor, index) => (
                       <Form.Group
                         className="mb-3"
                         controlId="exampleForm.ControlInput1"
                       >
-                        <Form.Label>Hội đồng chấm</Form.Label>
+                        <Form.Label>
+                          Giảng viên hướng dẫn {index + 1}
+                        </Form.Label>
                         <Form.Control
                           aria-label="Default select example"
-                          value={thesisDetail?.councilName || "Đang chờ duyệt"}
+                          value={instructor.name}
                           readOnly
                           type="text"
                         />
                       </Form.Group>
-                    </>
-                  )}
-                  {errors.listInstructor && (
-                    <div className="alert alert-danger" role="alert">
-                      {errors.listInstructor}
-                    </div>
-                  )}
-                </Form>
-              </Modal.Body>
-              <Modal.Footer>
-                <Button
-                  className="btn btn-secondary me-2"
-                  onClick={() => setShowDetail(false)}
-                >
-                  Đóng
-                </Button>
-                {thesisDetail?.status === "WAITING" && (
-                  <Button
-                    className="btn btn-primary"
-                    onClick={() => handleApprove()}
-                  >
-                    Phê duyệt
-                  </Button>
+                    ))}
+                    <Form.Group
+                      className="mb-3"
+                      controlId="exampleForm.ControlInput1"
+                    >
+                      <Form.Label>Hội đồng chấm</Form.Label>
+                      <Form.Control
+                        aria-label="Default select example"
+                        value={thesisDetail?.councilName || "Đang chờ duyệt"}
+                        readOnly
+                        type="text"
+                      />
+                    </Form.Group>
+                    <Form.Group
+                      className="mb-3"
+                      controlId="exampleForm.ControlInput1"
+                    >
+                      <Form.Label>Điểm trung bình</Form.Label>
+                      <Form.Control
+                        aria-label="Default select example"
+                        value={thesisDetail?.avgScore || "Chưa chấm"}
+                        readOnly
+                        type="text"
+                      />
+                    </Form.Group>
+                  </>
                 )}
-              </Modal.Footer>
-            </Modal>
-            <table className="table table-hover">
-              <thead>
+                {errors.listInstructor && (
+                  <div className="alert alert-danger" role="alert">
+                    {errors.listInstructor}
+                  </div>
+                )}
+              </Form>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button
+                className="btn btn-secondary me-2"
+                onClick={() => setShowDetail(false)}
+              >
+                Đóng
+              </Button>
+              {thesisDetail?.status === "WAITING" && (
+                <Button
+                  className="btn btn-primary"
+                  onClick={() => handleApprove()}
+                >
+                  Phê duyệt
+                </Button>
+              )}
+            </Modal.Footer>
+          </Modal>
+          <div className="d-flex justify-content-end align-items-center mb-3">
+            <InputGroup className="w-25">
+              <InputGroup.Text>
+                <Search />
+              </InputGroup.Text>
+              <Form.Control
+                placeholder="Tìm kiếm khóa luận ..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+              <Button variant="outline-secondary" onClick={() => setSearch("")}>
+                <ArrowClockwise />
+              </Button>
+            </InputGroup>
+          </div>
+          <table className="table table-hover">
+            <thead>
+              <tr>
+                <th>Mã</th>
+                <th>Tên khóa luận</th>
+                <th>Sinh viên</th>
+                <th>Khoa</th>
+                <th>Trạng thái</th>
+                <th>Hành động</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
                 <tr>
-                  <th>Mã</th>
-                  <th>Tên khóa luận</th>
-                  <th>Sinh viên</th>
-                  <th>Khoa</th>
-                  <th>Trạng thái</th>
-                  <th>Hành động</th>
+                  <td colSpan={6} className="text-center pt-3">
+                    <Spinner
+                      animation="border"
+                      role="status"
+                      className="text-primary"
+                    />
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {theses.map((thesis) => (
+              ) : (
+                theses.map((thesis) => (
                   <tr key={thesis.id} className="align-middle">
                     <td>{thesis.id}</td>
                     <td>{thesis.name}</td>
@@ -377,13 +458,35 @@ function StaffThesis() {
                       </div>
                     </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                ))
+              )}
+              {theses.length === 0 && !loading && (
+                <tr>
+                  <td colSpan={6} className="text-center pt-3">
+                    <p className="text-muted fw-bold">Không có dữ liệu</p>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+        <div className="d-flex justify-content-end align-items-center mt-3">
+          <div className="d-flex align-items-center gap-3">
+            <Pagination className="mb-0">
+              <Pagination.Prev
+                onClick={() => setCurrentPage(currentPage - 1)}
+                disabled={currentPage === 1}
+              >
+                <ChevronLeft />
+              </Pagination.Prev>
+              <Pagination.Next onClick={() => setCurrentPage(currentPage + 1)}>
+                <ChevronRight />
+              </Pagination.Next>
+            </Pagination>
           </div>
         </div>
-      )}
-    </Base>
+      </div>
+    </>
   );
 }
 
