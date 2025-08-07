@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { Navbar, Container, Nav } from "react-bootstrap";
+import { Navbar, Container, Nav, NavDropdown } from "react-bootstrap";
 import { PersonCircle } from "react-bootstrap-icons";
 import { UserContext } from "../../configs/Contexts";
 import { useNavigate } from "react-router-dom";
@@ -25,17 +25,56 @@ const Header = () => {
           </div>
         </Navbar.Brand>
         <Nav className="ms-auto align-items-center">
-          <PersonCircle size={28} className="me-2 text-white" />
-          <span className="text-white"></span>
-          <button
-            className="text-white btn btn-danger"
+
+          {user.avatar ? (
+            <img
+              src={user.avatar}
+              style={{
+                height: "32px",
+                width: "32px",
+                objectFit: "cover",
+                marginRight: "8px",
+                borderRadius: "50%",
+                border: "1px solid white",
+              }}
+            />
+          ) : (
+            <PersonCircle size={28} className="me-2 text-white" />
+          )}
+          <Navbar.Collapse id="navbar-dark-example">
+            <Nav>
+              <NavDropdown
+                id="nav-dropdown-dark-example"
+                title={user.fullName}
+                menuVariant="dark"
+                drop="down-centered"
+                align="end"
+              >
+                <NavDropdown.Item onClick={() => navigate("/profile")}>
+                  Thông tin cá nhân
+                </NavDropdown.Item>
+                <NavDropdown.Divider />
+                <NavDropdown.Item
+                  onClick={() => {
+                    dispatch({ type: "logout" });
+                    navigate("/login");
+                  }}
+                >
+                  Đăng xuất
+                </NavDropdown.Item>
+              </NavDropdown>
+            </Nav>
+          </Navbar.Collapse>
+          {/* <button
+            className="text-white btn btn-danger ms-2"
+>>>>>>> c1b70f53c7f51b1646b86b77c7b854387caa6c33
             onClick={() => {
               dispatch({ type: "logout" });
               navigate("/login");
             }}
           >
-            <span className="ms-2">Đăng xuất</span>
-          </button>
+            <span>Đăng xuất</span>
+          </button> */}
         </Nav>
       </Container>
     </Navbar>

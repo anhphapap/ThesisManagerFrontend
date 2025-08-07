@@ -8,8 +8,19 @@ export const endpoints = {
   login: "/login",
   profile: "/secure/profile",
   faculties: "/faculties",
-  lecturerOption:(facultyId) => `/faculties/${facultyId}/lecturers`,
-  councils: "/councils"
+  lecturerOption:(facultyId) => `/faculties/${facultyId}/lecturers-active`,
+  councils: "/councils",
+  lecturers: (facultyId) => `/faculties/${facultyId}/lecturers`,
+  studentThesis: `/secure/students/theses`,
+  lecturerThesis: `/secure/lecturers/instructor/theses`,
+  registerThesis: "/theses/add",
+  updateThesis: "/theses/update",
+  thesisUpload: (thesisId) => `/theses/${thesisId}/upload`,
+  getInstructor: (thesisId) => `/theses/${thesisId}/instructors`,
+  theses: "/theses",
+  thesisDetail: (thesisId) => `/theses/${thesisId}`,
+  updateUser: "/user/update",
+  changePassword: "/user/change-password",
 };
 
 export const authApis = () =>

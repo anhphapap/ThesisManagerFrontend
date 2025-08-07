@@ -16,21 +16,28 @@ const Sidebar = () => {
   const menuItems = [
     {
       icon: <FileEarmarkText />,
+      label: "Khóa luận của tôi",
+      path: "/students/thesis",
+      role: "STUDENT",
+    },
+    {
+      icon: <FileEarmarkText />,
       label: "Quản lý khóa luận",
-      path: "/students",
-      role: "student",
+      path: "/staff/thesis",
+      role: "ROLE_STAFF",
     },
     {
       icon: <PeopleFill />,
       label: "Quản lý hội đồng",
-      path: "/councils",
+      path: "/staff/councils",
       role: "ROLE_STAFF",
     },
     {
-      icon:<PeopleFill/>,
-      label: "Quản lý khóa luận",
-      path: "/thesises",
-      role: "ROLE_STAFF"
+
+      icon: <FileEarmarkText />,
+      label: "Khóa luận hướng dẫn",
+      path: "/lecturers/thesis",
+      role: "ROLE_USER",
     },
   ];
 
