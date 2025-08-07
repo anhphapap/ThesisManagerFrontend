@@ -3,6 +3,7 @@ import { Table, Button, Form, InputGroup, Dropdown,Pagination,Row,Col,Card,Modal
 import { Plus, Search, ArrowClockwise, Funnel,ChevronLeft,ChevronRight,Pencil,ThreeDots,Trash} from "react-bootstrap-icons";
 import Base from "../../Base";
 import Apis, { endpoints } from "../../../configs/Apis";
+import userEvent from "@testing-library/user-event";
 
 const Council = () => {
  const councils = [
@@ -22,19 +23,84 @@ const Council = () => {
     }
   ];
     const [faculties, setFaculties] = useState([]);
+    const [facultyId, setFacultyId] = useState();
+    const [lecturerOption, setLecturerOption] = useState([]);
+    const [members, setMembers] = useState([{ role: "chair", lectureId: "" }]);
     const [showModal, setShowModal] = useState(false);
-    const [members, setMembers] = useState([{ role: "", name: "" }
-  ]);
+    const [councilName, setCouncilName] = useState("");
+
+    const addMember = () => {
+      setMembers(prev => [...prev, { role: "",lecturerId: "" }]);
+    };
+      const removeMember = (index) => {
+    setMembers(prev => prev.filter((_, i) => i !== index));
+  };
+    const updateMember = (index, field, value) => {
+      setMembers(prev =>
+        prev.map((member, i) =>
+          i === index ? { ...member, [field]: value } : member
+        )
+      );
+    };
+
   const loadFaculties = async () => {
       let res = await Apis.get(endpoints.faculties);
       console.log(res.data);
     setFaculties(res.data);
      
   };
-
+  const loadLecturerOption = async (facultyId) =>{
+    let res = await Apis.get(endpoints.lecturerOption(facultyId)); console.log(res.data)
+    setLecturerOption(res.data);
+   
+  }
   useEffect(() => {
     loadFaculties();
   }, [])
+
+  // Hàm gửi API POST
+  const save = async () => {
+    try {
+      console.log(members)
+      const membersData = members
+        .filter(member => member.role && member.lecturerId)
+        .map(member => ({
+          role: member.role,
+          lecturerId: Number(member.lecturerId)
+        }));
+      
+      console.log(membersData);
+      
+      // Request data theo cấu trúc database
+      const requestData = {
+        name: councilName,           // council.name (String)
+        facultyId: Number(facultyId), // Convert String thành Number
+        status: true,                   // council.status (boolean) - mặc định true khi tạo mới
+        members: membersData         // Backend mong đợi "members"
+      };
+
+
+
+
+      // Gửi API POST
+      const response = await Apis.post(endpoints.councils, requestData);
+      console.log("Response:", response.data);
+
+      // Đóng modal và reset form
+      setShowModal(false);
+      setCouncilName("");
+      setFacultyId("");
+      setMembers([{ role: "", name: "" }]);
+      setLecturerOption([]);
+
+      // Có thể thêm thông báo thành công ở đây
+      alert("Thêm hội đồng thành công!");
+
+    } catch (error) {
+      console.error("Lỗi khi gửi API:", error);
+      alert("Có lỗi xảy ra khi thêm hội đồng!");
+    }
+  };
 
 
   return (
@@ -148,6 +214,8 @@ const Council = () => {
                   <Form.Control
                     type="text"
                     placeholder="Nhập tên hội đồng"
+                    value={councilName}
+                    onChange={(e) => setCouncilName(e.target.value)}
                   />
                 </Form.Group>
               </Col>
@@ -156,7 +224,11 @@ const Council = () => {
               <Col md={4}>
                 <Form.Group>
                   <Form.Label>Khoa</Form.Label>
-                  <Form.Select>
+                  <Form.Select onChange={(e)=>{
+                    loadLecturerOption(e.target.value);
+                    setFacultyId(e.target.value);
+                  }}>
+                    <option value = "">Chọn khoa</option>
                     {Array.isArray(faculties) && faculties.map(f => 
                       <option key={f.id} value={f.id}>{f.name}</option>
                     )}
@@ -175,10 +247,44 @@ const Council = () => {
                   </tr>
                 </thead>
                 <tbody>
-                 
+                  {members.map((member, index) => (
+                    <tr key={index}>
+                      <td>
+                        <Form.Select
+                          value={member.role}
+                          onChange={(e) => updateMember(index, 'role', e.target.value)}>
+                          <option value="chair">Chủ tịch</option>
+                          <option value="secretary">Thư ký</option>
+                          <option value="reviewer">Phản biện</option>
+                          <option value="member">Thành viên</option>
+                        </Form.Select>
+                      </td>
+                      <td>
+                        <Form.Group>
+                          <Form.Select
+                            value={member.lectureId}
+                            onChange={(e) => updateMember(index, 'lecturerId', e.target.value)}>
+                            <option>Chọn giảng viên</option>
+                            {Array.isArray(lecturerOption) && lecturerOption.map(l => 
+                              <option key={l.id} value={l.id}>{l.fullName}</option>
+                            )}
+                          </Form.Select>
+                        </Form.Group>
+                      </td>
+                      <td>
+                        <Button 
+                          variant="link" 
+                          size="sm" 
+                          className="p-0 text-danger"
+                          onClick={() => removeMember(index)}>
+                          <Trash size={16} />
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </Table>
-              <Button variant="success" size="sm">
+              <Button variant="success" size="sm" onClick={addMember}>
                 <Plus className="me-1" />
                 Thêm
               </Button>
@@ -189,7 +295,7 @@ const Council = () => {
           <Button variant="secondary" onClick={()=>setShowModal(false)}>
              Hủy bỏ
           </Button>
-          <Button variant="success">
+          <Button variant="success" onClick={save}>
             Lưu
           </Button>
         </Modal.Footer>
